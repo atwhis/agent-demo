@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: agent-demo-sales-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+        group: AGENT_DEMO
+      config:
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+        group: AGENT_DEMO
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "!test"
+    import: optional:nacos:${spring.application.name}-${spring.profiles.active:local}.yaml?group=AGENT_DEMO&refreshEnabled=true

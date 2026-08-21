@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: agent-demo-ai-service
+  ai:
+    model:
+      chat: none
+      embedding: none
+      image: none
+      moderation: none
+      audio:
+        speech: none
+        transcription: none
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+        group: AGENT_DEMO
+        namespace: ${NACOS_NAMESPACE:}
+      config:
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+        group: AGENT_DEMO
+        namespace: ${NACOS_NAMESPACE:}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "!test"
+    import: "optional:nacos:agent-demo-ai-service-${spring.profiles.active:local}.yaml?group=AGENT_DEMO&refreshEnabled=true"
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  cloud:
+    nacos:
+      discovery:
+        enabled: false
+      config:
+        enabled: false
+agent-demo:
+  ai:
+    models:
+      enabled: false

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Demo · 销售数据助手</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/styles/github-dark.min.css">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">SPRING AI TOOL CALLING LAB</p>
+        <h1>销售数据助手</h1>
+        <p class="subtitle">模型理解问题，销售服务计算数字，页面只呈现最终答案与可信图表。</p>
+      </div>
+      <label class="model-picker">
+        <span>对话模型</span>
+        <select id="modelSelect" aria-label="选择大模型"><option>正在加载…</option></select>
+      </label>
+    </header>
+
+    <section id="messages" class="messages" aria-live="polite">
+      <article class="message assistant welcome">
+        <div class="avatar">AI</div>
+        <div class="content">
+          <p>你好，我可以基于销售系统数据回答问题并生成图表。可以试试：</p>
+          <div class="suggestions">
+            <button>查询最近一个月购买商品数量最多的客户排行</button>
+            <button>查询最近三个月商品分类销售额占比</button>
+            <button>最近一个月最受欢迎的具体商品排行</button>
+            <button>最近三个月按周统计销售额趋势</button>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <form id="chatForm" class="composer">
+      <textarea id="promptInput" rows="2" maxlength="4000" placeholder="输入销售数据问题，Enter 发送，Shift + Enter 换行" required></textarea>
+      <div class="actions">
+        <span id="statusText">就绪</span>
+        <button id="stopButton" type="button" class="secondary" disabled>停止</button>
+        <button id="sendButton" type="submit" class="primary">发送</button>
+      </div>
+    </form>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/lib/common.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

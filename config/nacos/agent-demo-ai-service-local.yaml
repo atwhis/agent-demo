@@ -1,0 +1,19 @@
+server:
+  port: ${AI_SERVER_PORT:8082}
+
+agent-demo:
+  ai:
+    models:
+      enabled: ${AI_MODELS_ENABLED:true}
+    deepseek:
+      base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
+      api-key: ${DEEPSEEK_API_KEY:}
+    openai:
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+      api-key: ${OPENAI_API_KEY:}
+      model: ${OPENAI_MODEL:gpt-5.6-terra}
+
+logging:
+  level:
+    org.springframework.ai: INFO
+    com.atwhis.agentdemo: INFO
