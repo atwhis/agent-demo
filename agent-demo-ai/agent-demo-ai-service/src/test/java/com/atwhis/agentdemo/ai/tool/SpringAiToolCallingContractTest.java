@@ -61,4 +61,26 @@ class SpringAiToolCallingContractTest {
             assertThat(toolResponse.responseData()).contains("机械键盘", "3582.00");
         });
     }
+
+    @Test
+    void mockedModelCanRecordPresentationIntentAsAnIndependentToolCall() {
+        ToolResultRecorder recorder = new ToolResultRecorder();
+        var options = DefaultToolCallingChatOptions.builder()
+                .toolCallbacks(Arrays.asList(ToolCallbacks.from(new ChartTools(recorder))))
+                .toolContext(Map.of("traceId", "chart-trace"))
+                .build();
+        Prompt prompt = new Prompt("用饼图展示销售额", options);
+        var toolCall = new AssistantMessage.ToolCall(
+                "call-chart", "function", ChartTools.SELECT_VISUALIZATION,
+                "{\"chartType\":\"PIE\",\"metric\":\"销售额\"}");
+        ChatResponse mockedModelResponse = new ChatResponse(List.of(
+                new Generation(AssistantMessage.builder().content("").toolCalls(List.of(toolCall)).build())));
+
+        ToolCallingManager.builder().build().executeToolCalls(prompt, mockedModelResponse);
+
+        assertThat(recorder.findChartIntent("chart-trace")).hasValueSatisfying(intent -> {
+            assertThat(intent.type()).isEqualTo(com.atwhis.agentdemo.ai.chart.ChartIntent.Type.PIE);
+            assertThat(intent.metric()).isEqualTo("销售额");
+        });
+    }
 }

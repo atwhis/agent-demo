@@ -2,6 +2,7 @@ package com.atwhis.agentdemo.ai.config;
 
 import com.atwhis.agentdemo.ai.model.ModelDescriptor;
 import com.atwhis.agentdemo.ai.model.ModelRegistry;
+import com.atwhis.agentdemo.ai.tool.ChartTools;
 import com.atwhis.agentdemo.ai.tool.SalesTools;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.deepseek.DeepSeekChatModel;
@@ -28,6 +29,7 @@ public class AiModelConfiguration {
     @Bean("deepSeekChatClient")
     ChatClient deepSeekChatClient(
             SalesTools salesTools,
+            ChartTools chartTools,
             @Value("${agent-demo.ai.deepseek.base-url:https://api.deepseek.com}") String baseUrl,
             @Value("${agent-demo.ai.deepseek.api-key:}") String apiKey) {
         Assert.hasText(apiKey, "必须通过 DEEPSEEK_API_KEY 提供 DeepSeek API Key");
@@ -36,12 +38,13 @@ public class AiModelConfiguration {
         DeepSeekChatOptions.Builder optionsBuilder = DeepSeekChatOptions.builder();
         optionsBuilder.model(DeepSeekApi.ChatModel.DEEPSEEK_V4_FLASH);
         DeepSeekChatModel model = DeepSeekChatModel.builder().deepSeekApi(api).options(optionsBuilder.build()).build();
-        return ChatClient.builder(model).defaultTools(salesTools).build();
+        return ChatClient.builder(model).defaultTools(salesTools, chartTools).build();
     }
 
     @Bean("openAiChatClient")
     ChatClient openAiChatClient(
             SalesTools salesTools,
+            ChartTools chartTools,
             @Value("${agent-demo.ai.openai.base-url:https://api.openai.com}") String baseUrl,
             @Value("${agent-demo.ai.openai.api-key:}") String apiKey,
             @Value("${agent-demo.ai.openai.model:gpt-5.6-terra}") String modelName) {
@@ -50,7 +53,7 @@ public class AiModelConfiguration {
         OpenAiChatOptions.Builder optionsBuilder = OpenAiChatOptions.builder();
         optionsBuilder.baseUrl(baseUrl).apiKey(apiKey).model(modelName);
         OpenAiChatModel model = OpenAiChatModel.builder().options(optionsBuilder.build()).build();
-        return ChatClient.builder(model).defaultTools(salesTools).build();
+        return ChatClient.builder(model).defaultTools(salesTools, chartTools).build();
     }
 
     @Bean

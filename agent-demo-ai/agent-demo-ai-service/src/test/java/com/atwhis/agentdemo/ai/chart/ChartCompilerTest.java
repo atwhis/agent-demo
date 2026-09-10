@@ -38,4 +38,40 @@ class ChartCompilerTest {
                 List.of(java.util.Map.of("x", List.of(1))), java.util.Map.of("value", "x"), java.util.Map.of(), "tool"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    void appliesChartTypeAndMetricIndependentlyFromBusinessTool() {
+        ToolResult category = new ToolResult(SalesTools.CATEGORY_SHARE,
+                List.of(new CategorySalesShareItem(2L, "办公", 9, new BigDecimal("90.00"), new BigDecimal("45.00"))));
+        ChartSpec bar = compiler.compile(category, ChartIntent.from("bar", "销售额")).orElseThrow();
+        assertThat(bar.type()).isEqualTo("bar");
+        assertThat(bar.encoding()).containsEntry("category", "分类").containsEntry("value", "销售额");
+
+        ToolResult product = new ToolResult(SalesTools.POPULAR_PRODUCTS,
+                List.of(new PopularProductItem(1L, "商品 A", 17, 4, new BigDecimal("1234.56"))));
+        ChartSpec pie = compiler.compile(product, ChartIntent.from("pie", "销售额")).orElseThrow();
+        assertThat(pie.type()).isEqualTo("pie");
+        assertThat(pie.encoding()).containsEntry("name", "商品").containsEntry("value", "销售额");
+
+        ChartSpec line = compiler.compile(product, ChartIntent.from("line", "订单数")).orElseThrow();
+        assertThat(line.type()).isEqualTo("line");
+        assertThat(line.encoding()).containsEntry("x", "商品").containsEntry("y", "订单数");
+    }
+
+    @Test
+    void suppressesChartAndFallsBackFromInvalidOrUnavailableIntent() {
+        ToolResult result = new ToolResult(SalesTools.CATEGORY_SHARE,
+                List.of(new CategorySalesShareItem(2L, "办公", 9, new BigDecimal("90.00"), new BigDecimal("45.00"))));
+
+        assertThat(compiler.compile(result, ChartIntent.from("none", "DEFAULT"))).isEmpty();
+
+        ChartSpec invalid = compiler.compile(result, ChartIntent.from("scatter", "销售额")).orElseThrow();
+        assertThat(invalid.type()).isEqualTo("pie");
+        assertThat(invalid.encoding()).containsEntry("value", "销售占比");
+
+        ChartSpec unavailable = compiler.compile(result,
+                new ChartIntent(ChartIntent.Type.BAR, "购买数量")).orElseThrow();
+        assertThat(unavailable.type()).isEqualTo("bar");
+        assertThat(unavailable.encoding()).containsEntry("value", "销售占比");
+    }
 }

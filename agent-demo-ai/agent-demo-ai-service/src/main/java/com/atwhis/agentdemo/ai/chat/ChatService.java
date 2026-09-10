@@ -41,7 +41,10 @@ public class ChatService {
                 return Flux.just(SseEvent.error("BUSINESS_DATA_UNVERIFIED", "未取得有效销售数据，本次回答不能作为成功结果。请补充日期范围后重试。"));
             }
             List<SseEvent> events = new ArrayList<>();
-            if (result != null) chartCompiler.compile(result).ifPresent(chart -> events.add(SseEvent.chart(chart)));
+            if (result != null) {
+                chartCompiler.compile(result, recorder.findChartIntent(traceId).orElse(null))
+                        .ifPresent(chart -> events.add(SseEvent.chart(chart)));
+            }
             events.add(SseEvent.done(conversationId));
             return Flux.fromIterable(events);
         });
