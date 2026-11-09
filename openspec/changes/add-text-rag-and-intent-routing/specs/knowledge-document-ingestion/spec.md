@@ -5,14 +5,14 @@
 ## ADDED Requirements
 
 ### Requirement: Plain text import contract
-系统 SHALL 提供 POST /api/knowledge/documents/text 接收标题、正文、文本类型和 modelId，以及 POST /api/knowledge/documents/upload 接收同等元数据和单个 UTF-8 TXT 文件。正文大小 SHALL 限制为 200 KiB，标题 SHALL 为 1 至 80 个字符；空白正文、无效编码、非 TXT 上传或超限输入 MUST 在写入前拒绝。正文不得受聊天问题长度上限限制。
+系统 SHALL 提供 POST /api/knowledge/documents/text 接收标题、正文、文本类型和 modelId，以及 POST /api/knowledge/documents/upload 接收同等元数据和单个 UTF-8 TXT 文件。正文大小 SHALL 限制为 2 MiB，标题 SHALL 为 1 至 80 个字符；空白正文、无效编码、非 TXT 上传或超限输入 MUST 在写入前拒绝。正文不得受聊天问题长度上限限制。
 
 #### Scenario: Paste a knowledge document
 - **WHEN** 用户提交有效标题及一段不超过限制的纯文本
 - **THEN** 系统完成导入并返回 documentId、实际标题、类型、片段数量和是否重复的信息
 
 #### Scenario: Reject invalid input
-- **WHEN** 上传非 TXT、无效 UTF-8、空白或超过 200 KiB 的正文
+- **WHEN** 上传非 TXT、无效 UTF-8、空白或超过 2 MiB 的正文
 - **THEN** 系统返回可展示的输入错误，且不留下文档或向量片段
 
 ### Requirement: Content purpose classification

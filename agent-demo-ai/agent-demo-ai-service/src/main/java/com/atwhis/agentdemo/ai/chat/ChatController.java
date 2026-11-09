@@ -23,7 +23,7 @@ public class ChatController {
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<Object>> stream(@Valid @RequestBody ChatRequest request) {
         return chatService.stream(request)
-                // The browser receives stable event names (delta/chart/done/error), not raw model chunks.
+                // The browser receives stable event names (start/delta/chart/sources/done/error), not raw model chunks.
                 .map(event -> ServerSentEvent.builder(event.data()).event(event.type()).build());
     }
 }

@@ -5,6 +5,19 @@ agent-demo:
   ai:
     models:
       enabled: ${AI_MODELS_ENABLED:true}
+    knowledge:
+      enabled: ${AI_KNOWLEDGE_ENABLED:true}
+      url: ${KNOWLEDGE_DB_URL:jdbc:postgresql://127.0.0.1:5432/agent_demo_knowledge}
+      username: ${KNOWLEDGE_DB_USER:agent_demo}
+      password: ${KNOWLEDGE_DB_PASSWORD}
+      embedding-directory: classpath:models/embedding
+      reranker-directory: classpath:models/reranker
+      target-tokens: 320
+      max-tokens: 400
+      overlap-tokens: 40
+      top-k: 15
+      top-n: 5
+      minimum-logit: -3.0
     deepseek:
       base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
       api-key: ${DEEPSEEK_API_KEY:}

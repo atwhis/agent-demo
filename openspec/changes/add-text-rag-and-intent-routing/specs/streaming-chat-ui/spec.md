@@ -39,6 +39,10 @@
 - **WHEN** 用户已输入问题但尚未发送，随后点击导入文本
 - **THEN** 同一输入区切换为导入状态并保留原问题草稿，不跳转页面
 
+#### Scenario: Select a TXT file without opening its body in the composer
+- **WHEN** 用户选择一个合规的 TXT 文件
+- **THEN** 页面显示文件名与大小并隐藏正文框，确认导入时通过 multipart 提交文件。移除文件后恢复正文框和原有粘贴草稿
+
 ### Requirement: Import completion and cancellation restore chat
 导入成功 SHALL 显示实际标题、类型、片段数量和重复状态，并恢复聊天及原问题草稿；提交前取消导入 SHALL 不提交正文并恢复草稿，导入失败 SHALL 保留已填内容便于修改或重试。提交后停止等待不得被宣称为已撤销服务端入库，重试 SHALL 遵循内容去重结果。导入正文不得当作用户聊天问题保存；新会话不得删除已导入知识。
 

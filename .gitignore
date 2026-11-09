@@ -4,4 +4,8 @@
 **/target/
 *.log
 .DS_Store
-/agent-demo-ai/agent-demo-ai-service/src/main/resources/models/
+/agent-demo-ai/agent-demo-ai-service/src/main/resources/models/embedding/*
+!/agent-demo-ai/agent-demo-ai-service/src/main/resources/models/embedding/README.md
+/agent-demo-ai/agent-demo-ai-service/src/main/resources/models/reranker/*
+!/agent-demo-ai/agent-demo-ai-service/src/main/resources/models/reranker/README.md
+**/src/test/java/

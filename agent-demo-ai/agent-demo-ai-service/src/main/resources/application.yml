@@ -10,6 +10,15 @@ spring:
       audio:
         speech: none
         transcription: none
+  http:
+    codecs:
+      # JSON escaping may expand a 2 MiB text body by up to six times.
+      max-in-memory-size: 13MB
+  webflux:
+    multipart:
+      max-parts: 4
+      max-in-memory-size: 200KB
+      max-disk-usage-per-part: 2MB
   cloud:
     nacos:
       discovery:

@@ -12,13 +12,17 @@ public record ChartSpec(
         List<Map<String, Object>> rows,
         Map<String, String> encoding,
         Map<String, Object> options,
-        String sourceTool) {
+        String sourceTool,
+        String sourceCallId) {
 
     public ChartSpec {
         dimensions = List.copyOf(dimensions);
         rows = rows.stream().map(Map::copyOf).toList();
         encoding = Map.copyOf(encoding);
         options = Map.copyOf(options);
+        if (sourceCallId == null || sourceCallId.isBlank()) {
+            throw new IllegalArgumentException("缺少图表来源 callId");
+        }
         validate(version, type, dimensions, rows, encoding, options, sourceTool);
     }
 

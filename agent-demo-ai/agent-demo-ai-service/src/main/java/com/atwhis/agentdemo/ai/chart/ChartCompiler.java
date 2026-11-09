@@ -17,67 +17,63 @@ import java.util.UUID;
 
 @Component
 public class ChartCompiler {
-    public Optional<ChartSpec> compile(ToolResult result) {
-        return compile(result, ChartIntent.auto());
-    }
-
-    public Optional<ChartSpec> compile(ToolResult result, ChartIntent intent) {
+    public Optional<ChartSpec> compile(ToolResult result, ChartIntent intent, String callId) {
         if (result.rows().isEmpty()) return Optional.empty();
         ChartIntent selection = intent == null ? ChartIntent.auto() : intent;
         if (selection.type() == ChartIntent.Type.NONE) return Optional.empty();
         // Charts are derived from trusted Tool rows, never from model-authored JSON or JavaScript.
         return Optional.of(switch (result.toolName()) {
-            case SalesTools.CUSTOMER_RANKING -> customer(result, selection);
-            case SalesTools.CATEGORY_SHARE -> category(result, selection);
-            case SalesTools.POPULAR_PRODUCTS -> product(result, selection);
-            case SalesTools.SALES_TREND -> trend(result, selection);
+            case SalesTools.CUSTOMER_RANKING -> customer(result, selection, callId);
+            case SalesTools.CATEGORY_SHARE -> category(result, selection, callId);
+            case SalesTools.POPULAR_PRODUCTS -> product(result, selection, callId);
+            case SalesTools.SALES_TREND -> trend(result, selection, callId);
             default -> throw new IllegalArgumentException("未知的图表来源 Tool");
         });
     }
 
-    private ChartSpec customer(ToolResult result, ChartIntent intent) {
+    private ChartSpec customer(ToolResult result, ChartIntent intent, String callId) {
         List<Map<String, Object>> rows = new ArrayList<>();
         for (Object value : result.rows()) {
             CustomerPurchaseRankingItem item = (CustomerPurchaseRankingItem) value;
             rows.add(row("客户", item.customerName(), "购买数量", item.purchaseQuantity(), "订单数", item.orderCount(), "销售额", item.salesAmount()));
         }
         return spec(intent, "bar", "客户购买数量排行", "客户", "购买数量",
-                List.of("客户", "购买数量", "订单数", "销售额"), rows, true, result.toolName());
+                List.of("客户", "购买数量", "订单数", "销售额"), rows, true, result.toolName(), callId);
     }
 
-    private ChartSpec category(ToolResult result, ChartIntent intent) {
+    private ChartSpec category(ToolResult result, ChartIntent intent, String callId) {
         List<Map<String, Object>> rows = new ArrayList<>();
         for (Object value : result.rows()) {
             CategorySalesShareItem item = (CategorySalesShareItem) value;
             rows.add(row("分类", item.categoryName(), "销售占比", item.percentage(), "销售数量", item.salesQuantity(), "销售额", item.salesAmount()));
         }
         return spec(intent, "pie", "商品分类销售额占比", "分类", "销售占比",
-                List.of("分类", "销售占比", "销售数量", "销售额"), rows, false, result.toolName());
+                List.of("分类", "销售占比", "销售数量", "销售额"), rows, false, result.toolName(), callId);
     }
 
-    private ChartSpec product(ToolResult result, ChartIntent intent) {
+    private ChartSpec product(ToolResult result, ChartIntent intent, String callId) {
         List<Map<String, Object>> rows = new ArrayList<>();
         for (Object value : result.rows()) {
             PopularProductItem item = (PopularProductItem) value;
             rows.add(row("商品", item.productName(), "销售数量", item.salesQuantity(), "订单数", item.orderCount(), "销售额", item.salesAmount()));
         }
         return spec(intent, "bar", "热门商品销售数量排行", "商品", "销售数量",
-                List.of("商品", "销售数量", "订单数", "销售额"), rows, true, result.toolName());
+                List.of("商品", "销售数量", "订单数", "销售额"), rows, true, result.toolName(), callId);
     }
 
-    private ChartSpec trend(ToolResult result, ChartIntent intent) {
+    private ChartSpec trend(ToolResult result, ChartIntent intent, String callId) {
         List<Map<String, Object>> rows = new ArrayList<>();
         for (Object value : result.rows()) {
             SalesTrendPoint item = (SalesTrendPoint) value;
             rows.add(row("时间", item.bucketLabel(), "订单数", item.orderCount(), "销售数量", item.salesQuantity(), "销售额", item.salesAmount()));
         }
         return spec(intent, "line", "销售趋势", "时间", "销售额",
-                List.of("时间", "订单数", "销售数量", "销售额"), rows, false, result.toolName());
+                List.of("时间", "订单数", "销售数量", "销售额"), rows, false, result.toolName(), callId);
     }
 
     private ChartSpec spec(ChartIntent intent, String defaultType, String defaultTitle,
                            String category, String defaultMetric, List<String> dimensions,
-                           List<Map<String, Object>> rows, boolean horizontal, String sourceTool) {
+                           List<Map<String, Object>> rows, boolean horizontal, String sourceTool, String callId) {
         String type = intent.typeOr(defaultType);
         String metric = intent.metricOr(defaultMetric, dimensions);
         String title = metric.equals(defaultMetric) ? defaultTitle : metric + "（按" + category + "）";
@@ -92,7 +88,7 @@ public class ChartCompiler {
             default -> Map.of("horizontal", horizontal);
         };
         // ChartSpec validates the small declarative whitelist consumed by the ECharts adapter.
-        return new ChartSpec("1.0", UUID.randomUUID().toString(), type, title, dimensions, rows, encoding, options, sourceTool);
+        return new ChartSpec("1.0", UUID.randomUUID().toString(), type, title, dimensions, rows, encoding, options, sourceTool, callId);
     }
 
     private Map<String, Object> row(Object... values) {

@@ -11,6 +11,10 @@
 - **WHEN** 用户询问上个月热门商品前三名
 - **THEN** 选择 SALES，保留明确的排行目标与时间条件
 
+#### Scenario: Ask about a non-business document
+- **WHEN** 用户询问明确的知识问题，例如《西游记》中唐僧有几个徒弟
+- **THEN** 选择 RAG 并保留书名和人物等检索条件，由检索结果判断资料是否足够
+
 #### Scenario: Ask for sales definitions
 - **WHEN** 用户询问哪些订单状态计入销售额
 - **THEN** 选择 RAG，不因问题包含“销售额”就调用销售工具

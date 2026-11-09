@@ -80,7 +80,8 @@ public class SalesTools {
         List<?> safeRows = rows == null ? List.of() : List.copyOf(rows);
         // Keep the exact Feign result for server-side chart compilation and verification after model streaming.
         Object traceId = context.getContext().get("traceId");
-        recorder.record(traceId == null ? null : traceId.toString(), new ToolResult(toolName, safeRows));
+        recorder.capture(traceId == null ? null : traceId.toString(),
+                (String) context.getContext().get("callId"), new ToolResult(toolName, safeRows));
         return safeRows;
     }
 

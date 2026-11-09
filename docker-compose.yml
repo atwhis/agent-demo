@@ -45,6 +45,7 @@ services:
       SPRING_DATASOURCE_PLATFORM: mysql
       MYSQL_SERVICE_HOST: mysql
       MYSQL_SERVICE_PORT: 3306
+      MYSQL_SERVICE_DB_PARAM: "characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&sslMode=REQUIRED"
       MYSQL_SERVICE_DB_NAME: ${NACOS_DATABASE:-nacos_config}
       MYSQL_SERVICE_USER: ${MYSQL_USER:-agent_demo}
       MYSQL_SERVICE_PASSWORD: ${MYSQL_PASSWORD:-agent_demo}
@@ -52,7 +53,7 @@ services:
       NACOS_AUTH_ENABLE: ${NACOS_AUTH_ENABLE:-false}
       NACOS_AUTH_IDENTITY_KEY: ${NACOS_AUTH_IDENTITY_KEY:-agent-demo-server}
       NACOS_AUTH_IDENTITY_VALUE: ${NACOS_AUTH_IDENTITY_VALUE:-agent-demo-local-development}
-      NACOS_AUTH_TOKEN: ${NACOS_AUTH_TOKEN:-}
+      NACOS_AUTH_TOKEN: ${NACOS_AUTH_TOKEN:?set NACOS_AUTH_TOKEN in .env (see README.md)}
       JVM_XMS: ${NACOS_JVM_XMS:-512m}
       JVM_XMX: ${NACOS_JVM_XMX:-512m}
       JVM_XMN: ${NACOS_JVM_XMN:-256m}
@@ -76,6 +77,26 @@ services:
     networks:
       - agent-demo-network
 
+  pgvector:
+    image: ${PGVECTOR_IMAGE:-pgvector/pgvector:0.8.2-pg17}
+    container_name: agent-demo-pgvector
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${KNOWLEDGE_DB:-agent_demo_knowledge}
+      POSTGRES_USER: ${KNOWLEDGE_DB_USER:-agent_demo}
+      POSTGRES_PASSWORD: ${KNOWLEDGE_DB_PASSWORD:-agent_demo}
+    ports:
+      - "127.0.0.1:${KNOWLEDGE_DB_PORT:-5432}:5432"
+    volumes:
+      - agent-demo-knowledge-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - agent-demo-network
+
 networks:
   agent-demo-network:
     name: agent-demo-network
@@ -85,3 +106,4 @@ volumes:
     name: agent-demo-mysql-data
   agent-demo-nacos-logs:
     name: agent-demo-nacos-logs
+  agent-demo-knowledge-data:

@@ -37,7 +37,7 @@ Reranker 使用自己的 Unigram tokenizer，按配对模板编码问题与片�
 
 ### 2. 单份小文本同步导入，文档与向量共同持久化
 
-提供 text JSON 和单文件 upload 两个入口，元数据为 title、documentType（AUTO 或四个类型）、modelId，正文上限 200 KiB，标题上限 80 字。校验 UTF-8、文本内容和显式类型后，去掉 BOM、统一换行并计算内容 SHA256；相同正文返回已存在文档的实际元数据，不默默改标题或标签。
+提供 text JSON 和单文件 upload 两个入口，元数据为 title、documentType（AUTO 或四个类型）、modelId，正文上限 2 MiB，标题上限 80 字。校验 UTF-8、文本内容和显式类型后，去掉 BOM、统一换行并计算内容 SHA256；相同正文返回已存在文档的实际元数据，不默默改标题或标签。
 
 选择 AUTO 时使用当前选择的无 Tool ChatClient，根据标题和有界正文样本识别文档用途；失败回退其他，导入结果说明实际类型。用户指定类型则跳过自动分类。分类与文档用途标签不决定问答路由。
 

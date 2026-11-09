@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Agent Demo · 销售数据助手</title>
+  <title>智能问答助手</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/styles/github-dark.min.css">
   <link rel="stylesheet" href="/styles.css">
@@ -12,10 +12,11 @@
   <main class="shell">
     <header class="topbar">
       <div>
-        <p class="eyebrow">SPRING AI TOOL CALLING LAB</p>
-        <h1>销售数据助手</h1>
-        <p class="subtitle">模型理解问题，销售服务计算数字，页面只呈现最终答案与可信图表。</p>
+        <p class="eyebrow">SPRING AI LAB</p>
+        <h1>智能问答助手</h1>
+        <p class="subtitle">查询销售数据，或根据你导入的资料回答问题。</p>
       </div>
+      <button id="newConversationButton" type="button" class="secondary">新会话</button>
       <label class="model-picker">
         <span>对话模型</span>
         <select id="modelSelect" aria-label="选择大模型"><option>正在加载…</option></select>
@@ -26,7 +27,7 @@
       <article class="message assistant welcome">
         <div class="avatar">AI</div>
         <div class="content">
-          <p>你好，我可以基于销售系统数据回答问题并生成图表。可以试试：</p>
+          <p>你好，我可以查询销售数据，也可以根据你导入的资料回答问题。可以试试：</p>
           <div class="suggestions">
             <button>查询最近一个月购买商品数量最多的客户排行</button>
             <button>查询最近三个月商品分类销售额占比</button>
@@ -38,9 +39,25 @@
     </section>
 
     <form id="chatForm" class="composer">
-      <textarea id="promptInput" rows="2" maxlength="4000" placeholder="输入销售数据问题，Enter 发送，Shift + Enter 换行" required></textarea>
+      <div id="importFields" class="import-fields" hidden>
+        <label>文档标题 <input id="documentTitle" type="text" maxlength="80" disabled></label>
+        <label>用途 <select id="documentType" disabled>
+          <option value="AUTO">自动识别</option>
+          <option>制度规则</option>
+          <option>产品说明</option>
+          <option>操作指南</option>
+          <option>其他</option>
+        </select></label>
+        <label>选择 TXT <input id="documentFile" type="file" accept=".txt,text/plain" disabled>
+          <span id="documentFileSize" hidden></span>
+        </label>
+        <button id="removeDocumentFile" type="button" class="secondary" hidden>移除文件</button>
+      </div>
+      <textarea id="promptInput" rows="2" maxlength="4000" placeholder="输入销售数据或资料问题，Enter 发送，Shift + Enter 换行" required></textarea>
       <div class="actions">
-        <span id="statusText">就绪</span>
+        <button id="importButton" type="button" class="secondary">导入文本</button>
+        <button id="cancelImportButton" type="button" class="secondary" hidden>取消导入</button>
+        <span id="statusText" role="status">就绪</span>
         <button id="stopButton" type="button" class="secondary" disabled>停止</button>
         <button id="sendButton" type="submit" class="primary">发送</button>
       </div>

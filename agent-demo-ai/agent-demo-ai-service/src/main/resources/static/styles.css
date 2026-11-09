@@ -33,3 +33,18 @@ textarea { width:100%; resize:none; border:0; outline:0; padding:4px 6px 10px; c
 .secondary { border:1px solid var(--line); color:var(--ink); background:#fff; }
 button:disabled { opacity:.45; cursor:not-allowed; }
 @media (max-width:700px) { .shell{width:min(100% - 20px,1080px);padding-top:10px}.topbar{align-items:stretch;flex-direction:column;padding:20px}.model-picker{min-width:0}.content{max-width:calc(100% - 42px)}.chart{height:300px} }
+
+#newConversationButton { border:1px solid var(--line); border-radius:11px; padding:10px 14px; background:var(--card); color:var(--ink); cursor:pointer; white-space:nowrap; }
+
+.import-fields:not([hidden]) { display:flex; align-items:end; flex-wrap:wrap; gap:10px; margin-bottom:12px; }
+.import-fields label { display:grid; gap:4px; max-width:100%; font-size:12px; color:var(--muted); }
+.import-fields input { min-width:0; max-width:100%; font:inherit; }
+#removeDocumentFile { border-radius:11px; padding:6px 12px; cursor:pointer; }
+#documentTitle { padding:8px; border:1px solid var(--line); border-radius:8px; }
+.sources { margin-top:12px; border-top:1px solid var(--line); font-size:13px; }
+.sources p { white-space:pre-wrap; }
+@media (max-width:700px) {
+  .actions { flex-wrap:wrap; }
+  #statusText { order:-1; width:100%; overflow-wrap:anywhere; }
+  .import-fields label { flex:1 1 100%; }
+}
