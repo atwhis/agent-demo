@@ -158,6 +158,8 @@ macOS/Linux 终端使用冒号无关，IDEA 的变量编辑器既支持逐项填
 
 前端不会显示推理内容、Tool 名称、Tool 参数、Feign 信息或中间结果。Markdown 经过 DOMPurify 清理；图表仅接受 `bar`、`pie`、`line` 三类声明式协议，模型不能生成或执行 ECharts option、函数或 JavaScript。
 
+聊天整轮默认最多等待 120 秒（包含意图识别、检索、工具和回答生成，流式片段不会重置计时）。可在 AI 服务的 Nacos 配置设置 `agent-demo.ai.chat.timeout-seconds`，示例支持环境变量 `AI_CHAT_TIMEOUT_SECONDS`；修改后重启 AI 服务。超时返回 `CHAT_TIMEOUT` 友好提示，不发送成功 done、不写会话历史，并释放当前会话以便重试。取消订阅不能保证立即停止供应商端生成或正在执行的本地原生推理，迟到结果不会提交为成功回答。
+
 AI 服务以 `chat_timing` 记录毫秒耗时。按 `turnId` 可以串起意图识别、各阶段及服务端完成或取消整轮请求的日志。
 
 - RAG 分开记录问题向量化、PgVector TopK 查询、重排选取 TopN 和模型生成。无候选或证据时，未执行的阶段标为 `SKIPPED`。

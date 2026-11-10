@@ -8,11 +8,13 @@ import com.atwhis.agentdemo.ai.tool.ToolResultRecorder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.time.Duration;
 import java.util.UUID;
 
 import static com.atwhis.agentdemo.ai.chat.IntentRouter.Route.SALES;
@@ -27,6 +29,9 @@ public class ChatService {
     private final IntentRouter router;
     private final ModelRegistry models;
     private final ObjectProvider<KnowledgeService> knowledge;
+
+    @Value("${agent-demo.ai.chat.timeout-seconds:120}")
+    private long timeoutSeconds = 120;
 
     public Flux<SseEvent> stream(ChatRequest request) {
         return Flux.defer(() -> {
@@ -49,6 +54,9 @@ public class ChatService {
                 };
             });
             return Flux.just(SseEvent.start(cid, turn.turnId)).concatWith(execution.takeUntilOther(turn.cancellation()))
+                    // One deadline for the whole turn; streamed chunks do not reset it.
+                    .takeUntilOther(Mono.delay(Duration.ofSeconds(timeoutSeconds))
+                            .flatMap(ignored -> Mono.error(new ChatTimeoutException())))
                     .doOnError(error -> conversations.finish(turn, "FAILED"))
                     .doFinally(signal -> {
                         conversations.finish(turn, "CANCELLED");
@@ -58,6 +66,10 @@ public class ChatService {
                     });
         }).onErrorResume(error -> {
             log.warn("Chat failed: {}", error.getClass().getSimpleName());
+            if (error instanceof ChatTimeoutException) {
+                return Flux.just(SseEvent.error("CHAT_TIMEOUT",
+                        "本次回答等待超过 " + timeoutSeconds + " 秒，已停止等待。请稍后重试，或缩小问题范围。"));
+            }
             if (error instanceof ConversationService.ConversationBusyException) {
                 return Flux.just(SseEvent.error("CONVERSATION_BUSY", error.getMessage()));
             }
@@ -133,6 +145,8 @@ public class ChatService {
             return Mono.just(SseEvent.done(turn.conversationId, turn.turnId, route));
         });
     }
+
+    private static final class ChatTimeoutException extends RuntimeException { }
 
     private static final class KnowledgeFailure extends RuntimeException {
         KnowledgeFailure(Throwable cause) {

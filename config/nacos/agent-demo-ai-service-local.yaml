@@ -3,6 +3,8 @@ server:
 
 agent-demo:
   ai:
+    chat:
+      timeout-seconds: ${AI_CHAT_TIMEOUT_SECONDS:120}
     models:
       enabled: ${AI_MODELS_ENABLED:true}
     knowledge:
